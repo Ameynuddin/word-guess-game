@@ -13,12 +13,13 @@ const wordList = [
 ];
 
 // Select elements from the HTML document
-const inputs = document.querySelector(".letters"); // Container for input boxes containing the word
-const hint = document.querySelector(".hint span"); // Span to display the hint
-const guessLeft = document.querySelector(".guess-left span"); // Span to display remaining guesses
-const wrongLetter = document.querySelector(".wrong-letters span"); // Span to display wrong letters
+const inputs = document.querySelector(".letters"); // Container for input boxes containing the letter
+const hint = document.querySelector(".hint span"); // To display the hint
+const guessLeft = document.querySelector(".guess-left span"); // To display remaining guesses
+const wrongLetter = document.querySelector(".wrong-letters span"); // To display wrong letters
 
 const typingInput = document.querySelector(".type-input"); // Input field for typing guesses
+const resetBtn = document.querySelector(".reset"); // To reset the game
 
 
 // Game variables
@@ -50,35 +51,42 @@ function handleUserInput(event) {
     // Check if the entered key is a valid alphabet letter and not already guessed
     if (key.match(/^[a-z]$/) && !incorrects.includes(key) && !corrects.includes(key)) {
         if (word.includes(key)) {
-            // If the key is in the word, reveal it in the input boxes
+            // If the key is in the word, display it in the input boxes
             word.split("").forEach((letter, index) => {
                 if (letter === key) {
-                    corrects.push(key); // Add to correct guesses
+                    corrects.push(key); // Append to correct letters array
                     inputs.querySelectorAll("input")[index].value = key; // Update the input box
                 }
             });
+
         } else {
             // If the key is not in the word, decrement remaining guesses and add to wrong letters
             maxGuesses--;
-            incorrects.push(key); // Add to incorrect guesses
+            incorrects.push(key); // Append to incorrect letters array
+            if (maxGuesses === 0) {
+                guessLeft.innerText = "No guesses left!";
+            } else {
+                guessLeft.innerText = `${maxGuesses} guess${maxGuesses !== 1 ? 'es' : ''} left`;
+            }
         }
-        updateGameStatus(); // Update the game status (remaining guesses and wrong letters)
+        updateGameStatus(); // Naviagte to the game status function
     }
-    typingInput.value = ""; // Clear the input field
+    typingInput.value = ""; // Clear the input fields
 }
 
 // Function to update the game status display
 function updateGameStatus() {
-    guessLeft.innerText = maxGuesses; // Update remaining guesses in the UI
-    wrongLetter.innerText = incorrects.join(" "); // Update wrong letters in the UI
+    guessLeft.innerText = maxGuesses; // Update remaining guesses
+    wrongLetter.innerText = incorrects.join(", "); // Show wrong letters separated with comma
 
     setTimeout(() => {
         if (corrects.length === word.length) {
-            // If all letters are guessed correctly, display a success message and reset the game
+            // If guessed correctly, success message will be displayed & the game is restarted
             alert(`Congrats! You found the word: ${word.toUpperCase()}`);
-            initializeGame(); // Restart the game with a new word
-        } else if (maxGuesses < 1) {
-            // If no guesses remain, display a game over message and reveal the word
+            initializeGame(); // Call function to restart the game
+
+        } else if (maxGuesses == 0) {
+            // If guesses deplete, game is over & the answer will be revealed
             alert(`Game over! The word was: ${word.toUpperCase()}`);
             // Reveal the word by filling in all input boxes
             inputs.querySelectorAll("input").forEach((input, index) => {
@@ -97,6 +105,9 @@ inputs.addEventListener("click", () => typingInput.focus());
 
 // Event listener to focus the input field when any key is pressed
 document.addEventListener("keydown", () => typingInput.focus());
+
+// Event listener for the reset button to restart the game
+resetBtn.addEventListener("click", initializeGame);
 
 
 // Call the function to initialize the game
