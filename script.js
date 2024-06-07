@@ -67,6 +67,26 @@ function handleUserInput(event) {
     typingInput.value = ""; // Clear the input field
 }
 
+// Function to update the game status display
+function updateGameStatus() {
+    guessLeft.innerText = maxGuesses; // Update remaining guesses in the UI
+    wrongLetter.innerText = incorrects.join(" "); // Update wrong letters in the UI
+
+    setTimeout(() => {
+        if (corrects.length === word.length) {
+            // If all letters are guessed correctly, display a success message and reset the game
+            alert(`Congrats! You found the word: ${word.toUpperCase()}`);
+            initializeGame(); // Restart the game with a new word
+        } else if (maxGuesses < 1) {
+            // If no guesses remain, display a game over message and reveal the word
+            alert(`Game over! The word was: ${word.toUpperCase()}`);
+            // Reveal the word by filling in all input boxes
+            inputs.querySelectorAll("input").forEach((input, index) => {
+                input.value = word[index];
+            });
+        }
+    }, 100); // Delay to allow the last key to be processed
+}
 
 
 // Event listener for typing input to handle user guesses
